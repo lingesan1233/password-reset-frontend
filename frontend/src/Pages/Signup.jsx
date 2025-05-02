@@ -1,19 +1,42 @@
-import { useState } from "react";
-import axios from "axios";
+import React, { useState } from "react";
 
-export default function Signup() {
+const Signup = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const handleSignup = async () => {
-    await axios.post(`${process.env.REACT_APP_API}/auth/signup`, { email, password });
-    alert("Signup successful");
+  const [message, setMessage] = useState("");
+
+  const handleSignup = async (e) => {
+    e.preventDefault();
+    setMessage("");
+
+    try {
+      const res = await fetch(`${process.env.REACT_APP_API}/auth/signup`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        setMessage("✅ Signup successful! You can now login.");
+      } else {
+        setMessage(`❌ ${data.message || "Signup failed"}`);
+      }
+    } catch (err) {
+      setMessage("❌ Error connecting to backend.");
+    }
   };
+
   return (
-    <div>
+    <form onSubmit={handleSignup}>
       <h2>Signup</h2>
-      <input placeholder="Email" onChange={e => setEmail(e.target.value)} /><br/>
-      <input placeholder="Password" type="password" onChange={e => setPassword(e.target.value)} /><br/>
-      <button onClick={handleSignup}>Signup</button>
-    </div>
+      {message && <div className="alert alert-info">{message}</div>}
+      <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+      <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+      <button type="submit">Signup</button>
+    </form>
   );
-}
+};
+
+export default Signup;
