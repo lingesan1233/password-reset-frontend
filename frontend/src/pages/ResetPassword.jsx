@@ -2,24 +2,32 @@ import React, { useState } from 'react';
 import axios from 'axios';
 
 const ResetPassword = () => {
-  const [email, setEmail] = useState('');
-  const [newPassword, setNewPassword] = useState('');
+  const [formData, setFormData] = useState({ email: '', newPassword: '' });
+  const backendURL = 'https://your-backend-url.com';
 
-  const handleReset = async () => {
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     try {
-      await axios.post('http://localhost:5000/api/auth/reset-password', { email, newPassword });
+      await axios.post(`${backendURL}/api/reset-password`, formData);
       alert('Password reset successful');
-    } catch {
-      alert('Failed to reset password');
+    } catch (err) {
+      console.error(err);
+      alert('Password reset failed');
     }
   };
 
   return (
-    <div>
+    <div className="form-container">
       <h2>Reset Password</h2>
-      <input placeholder="Email" onChange={e => setEmail(e.target.value)} />
-      <input placeholder="New Password" onChange={e => setNewPassword(e.target.value)} />
-      <button onClick={handleReset}>Reset</button>
+      <form onSubmit={handleSubmit}>
+        <input type="email" name="email" placeholder="Email" onChange={handleChange} required />
+        <input type="password" name="newPassword" placeholder="New Password" onChange={handleChange} required />
+        <button type="submit">Reset Password</button>
+      </form>
     </div>
   );
 };

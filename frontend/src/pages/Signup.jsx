@@ -1,25 +1,36 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 const Signup = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [formData, setFormData] = useState({ email: '', password: '' });
+  const navigate = useNavigate();
+  const backendURL = 'https://your-backend-url.com';
 
-  const handleSignup = async () => {
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     try {
-      await axios.post('http://localhost:5000/api/auth/signup', { email, password });
-      alert('Signup successful');
-    } catch {
+      await axios.post(`${backendURL}/api/signup`, formData);
+      alert('Signup successful. Please login.');
+      navigate('/login');
+    } catch (err) {
+      console.error(err);
       alert('Signup failed');
     }
   };
 
   return (
-    <div>
+    <div className="form-container">
       <h2>Signup</h2>
-      <input placeholder="Email" onChange={e => setEmail(e.target.value)} />
-      <input placeholder="Password" type="password" onChange={e => setPassword(e.target.value)} />
-      <button onClick={handleSignup}>Signup</button>
+      <form onSubmit={handleSubmit}>
+        <input type="email" name="email" placeholder="Email" onChange={handleChange} required />
+        <input type="password" name="password" placeholder="Password" onChange={handleChange} required />
+        <button type="submit">Signup</button>
+      </form>
     </div>
   );
 };
