@@ -1,19 +1,24 @@
 import { useState } from "react";
-import { reset } from "../api";
+import { resetPassword } from "../api/authApi";
 
-export default function Reset() {
+function ResetPassword() {
   const [form, setForm] = useState({ email: "", newPassword: "" });
-  const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
-  const handleSubmit = async () => {
-    await reset(form);
-    alert("Password reset!");
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const res = await resetPassword(form);
+      alert(res.message);
+    } catch (err) {
+      alert(err.response?.data?.message || "Reset failed");
+    }
   };
 
   return (
-    <div>
-      <input name="email" onChange={handleChange} placeholder="Email" />
-      <input name="newPassword" type="password" onChange={handleChange} placeholder="New Password" />
-      <button onClick={handleSubmit}>Reset Password</button>
-    </div>
+    <form onSubmit={handleSubmit}>
+      <input type="email" placeholder="Email" required onChange={e => setForm({...form, email: e.target.value})} />
+      <input type="password" placeholder="New Password" required onChange={e => setForm({...form, newPassword: e.target.value})} />
+      <button type="submit">Reset Password</button>
+    </form>
   );
 }
